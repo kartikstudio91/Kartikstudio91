@@ -1,0 +1,70 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Kartik Studio - Photo Enhancer</title>
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; margin: 50px; background-color: #f4f4f4; }
+            #upload { margin: 20px; }
+            #enhanced { margin-top: 20px; display: none; }
+        </style>
+    </head>
+    <body>
+        <h1>Kartik Studio - Photo Enhancer</h1>
+        <p>Upload an image to enhance its quality.</p>
+        <input type="file" id="upload" accept="image/*">
+        <br>
+        <canvas id="canvas"></canvas>
+        <br>
+        <button onclick="enhancePhoto()">Enhance Photo</button>
+        <a id="download" style="display:none;" download="enhanced_photo.png">Download Enhanced Photo</a>
+        
+        <script>
+            function enhancePhoto() {
+                let fileInput = document.getElementById('upload');
+                let canvas = document.getElementById('canvas');
+                let ctx = canvas.getContext('2d');
+                let downloadLink = document.getElementById('download');
+
+                if (fileInput.files.length === 0) {
+                    alert('Please upload an image first!');
+                    return;
+                }
+
+                let file = fileInput.files[0];
+                let reader = new FileReader();
+
+                reader.onload = function(event) {
+                    let img = new Image();
+                    img.onload = function() {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0, img.width, img.height);
+
+                        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        let data = imageData.data;
+
+                        for (let i = 0; i < data.length; i += 4) {
+                            data[i] = Math.min(255, data[i] * 1.1); // Red
+                            data[i + 1] = Math.min(255, data[i + 1] * 1.1); // Green
+                            data[i + 2] = Math.min(255, data[i + 2] * 1.1); // Blue
+                        }
+                        ctx.putImageData(imageData, 0, 0);
+
+                        downloadLink.href = canvas.toDataURL();
+                        downloadLink.style.display = 'block';
+                    };
+                    img.src = event.target.result;
+                };
+
+                reader.readAsDataURL(file);
+            }
+        </script>
+        <footer>
+            <p>&copy; 2024 Kartik Studio. All Rights Reserved.</p>
+        </footer>
+    </body>
+    </html>
+    
